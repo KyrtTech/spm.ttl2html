@@ -53,7 +53,7 @@ pub struct IndexEntry {
 }
 
 impl IndexEntry {
-    pub fn new(name: String, path: String) -> Self {
+    pub fn new(path: String, name: String) -> Self {
         IndexEntry { name, path }
     }
 }
