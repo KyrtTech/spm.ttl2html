@@ -21,6 +21,7 @@ struct Triple {
     subject_link: Option<String>,
     subject_label: String,
     predicate_link: Option<String>,
+    object_link: Option<String>,
 }
 
 impl Default for Triple {
@@ -32,6 +33,7 @@ impl Default for Triple {
             predicate_link: None,
             subject_link: None,
             subject_label: String::new(),
+            object_link: None,
         }
     }
 }
@@ -65,7 +67,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .long("input")
                 .value_name("INPUT_DIR")
                 .help("Sets the input directory")
-                .required(true)
+                .required(true),
         )
         .arg(
             Arg::new("output")
@@ -73,7 +75,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .long("output")
                 .value_name("OUTPUT_DIR")
                 .help("Sets the output directory")
-                .required(true)
+                .required(true),
         )
         .get_matches();
 
@@ -134,6 +136,17 @@ fn update_triple_with_links(triple: &mut Triple, prefixes: &Vec<&String>) {
             }
         }
     }
+
+    if is_valid_url(&triple.object) {
+        for prefix in prefixes {
+            if triple.object.starts_with(*prefix) {
+                triple.object_link = Some(triple.object.clone());
+                triple.object = triple.object.replace(*prefix, "");
+
+                break;
+            }
+        }
+    }
 }
 
 fn convert_file(
@@ -171,6 +184,7 @@ fn convert_file(
                 object,
                 subject_link: None,
                 predicate_link: None,
+                object_link: None
             };
 
             unparsed_triples.push(triple);

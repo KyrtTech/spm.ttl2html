@@ -80,8 +80,8 @@
             {% else %} {{ triple.predicate }} {% endif %}
           </td>
           <td>
-            {% if triple.object_is_link %}
-            <a href="{{ triple.object }}">{{ triple.object }}</a>
+            {% if triple.object_link %}
+            <a href="{{ triple.object_link }}">{{ triple.object }}</a>
             {% else %} {{ triple.object }} {% endif %}
           </td>
         </tr>
