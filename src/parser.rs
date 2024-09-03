@@ -159,13 +159,20 @@ pub fn convert_file(
 
     let mut subject_groups: Vec<SubjectGroup> = subject_groups_map
         .into_iter()
-        .map(|(subject, triples)| SubjectGroup {
-            subject,
-            subject_link: triples[0].subject_link.clone(),
-            subject_label: triples[0].subject_label.clone(),
-            triples,
+        .map(|(subject, mut triples)| {
+            //  sort by predicate
+            triples.sort_by(|a, b| a.predicate.cmp(&b.predicate));
+
+            SubjectGroup {
+                subject,
+                subject_link: triples[0].subject_link.clone(),
+                subject_label: triples[0].subject_label.clone(),
+                triples,
+            }
         })
         .collect();
+
+    // sort by subject
     subject_groups.sort_by(|a, b| a.subject.cmp(&b.subject));
 
     let mut context = Context::new();
