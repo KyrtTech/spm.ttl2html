@@ -3,7 +3,7 @@ use std::fs;
 
 use std::path::{Path, PathBuf};
 
-use rio_api::model::{NamedNode, Subject, Term};
+use rio_api::model::{NamedNode, Subject, Term, Literal};
 use rio_api::parser::TriplesParser;
 use rio_turtle::{TurtleError, TurtleParser};
 
@@ -117,7 +117,10 @@ pub fn convert_file(
             let predicate = t.predicate.iri.to_string();
             let object = match t.object {
                 Term::NamedNode(NamedNode { iri }) => iri.to_string(),
-                Term::Literal(literal) => literal.to_string(),
+                Term::Literal(Literal::Simple {value}) => value.to_string().trim_matches('"').to_string(),
+                Term::Literal(Literal::Typed {value, datatype}) => {
+                    format!("{}", value)
+                },
                 _ => String::new(),
             };
 
