@@ -121,6 +121,9 @@ pub fn convert_file(
                 Term::Literal(Literal::Typed {value, datatype}) => {
                     format!("{}", value)
                 },
+                Term::Literal(Literal::LanguageTaggedString { value, language }) => {
+                    format!("{} (@{})", value, language)
+                }
                 _ => String::new(),
             };
 
