@@ -47,6 +47,9 @@
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
+      .predicate {
+        display: flex;
+      }
       footer {
         text-align: center;
         margin-top: 20px;
@@ -74,7 +77,7 @@
         </tr>
         {% for triple in subject_group.triples %}
         <tr>
-          <td>
+          <td class="predicate">
             {% if triple.predicate_link %}
             <a href="{{ triple.predicate_link }}">{{ triple.predicate }}</a>
             {% else %} {{ triple.predicate }} {% endif %}
