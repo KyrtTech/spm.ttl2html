@@ -90,6 +90,10 @@ fn update_triple_with_links(triple: &mut Triple, prefixes: &Vec<&String>) {
                 break;
             }
         }
+
+        // we may still have a valid url, but not a prefix
+        // this could be an external link
+        triple.object_link = Some(triple.object.clone());
     }
 }
 
