@@ -76,8 +76,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Ok(rel_path) => {
                     println!("Successfully converted {:?}", path);
                     index_entries.push(IndexEntry::new(
-                        rel_path.to_string_lossy().to_string(),
-                        path.file_name().unwrap().to_string_lossy().to_string(),
+                        rel_path.to_string_lossy().to_string().replace(output_dir, ""),
+                        path.with_extension("").file_name().unwrap().to_string_lossy().to_string(),
                     ));
                 }
                 Err(e) => eprintln!("Error converting file {:?}: {}", path, e),
