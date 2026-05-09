@@ -3,7 +3,7 @@ mod parser;
 use crate::parser::{convert_file, generate_index, IndexEntry};
 
 use clap::{Arg, Command};
-use std::fs;
+use std::{collections::HashMap, fs, path::Path};
 use tera::Tera;
 use walkdir::WalkDir;
 
@@ -28,10 +28,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .help("Sets the output directory")
                 .required(true),
         )
+        .arg(
+            Arg::new("manifest")
+                .short('m')
+                .long("manifest")
+                .value_name("MANIFEST_FILE")
+                .help("Sets the manifest file")
+                .required(false),
+        )
         .get_matches();
 
     let input_dir = matches.get_one::<String>("input").unwrap();
     let output_dir = matches.get_one::<String>("output").unwrap();
+    let manifest: HashMap<String, HashMap<String, String>> =
+        if let Some(path) = matches.get_one::<String>("manifest") {
+            let raw = fs::read_to_string(path)?;
+            serde_json::from_str(&raw)?
+        } else {
+            HashMap::new()
+        };
 
     fs::create_dir_all(output_dir)?;
 
@@ -47,7 +62,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let path = entry.path();
         if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("ttl") {
             println!("Converting file: {:?}", path);
-            match convert_file(path, input_dir, output_dir, &tera) {
+            let relative_path = path.strip_prefix(input_dir)?.with_extension("").to_string_lossy().to_string();
+            let output_path = Path::new(output_dir)
+                .join(
+                    manifest
+                        .get("routes")
+                        .unwrap_or(&HashMap::new())
+                        .get(&relative_path)
+                        .unwrap_or_else(|| &relative_path)
+                )
+                .with_extension("html");
+            match convert_file(path, &output_path, &tera) {
                 Ok(rel_path) => {
                     println!("Successfully converted {:?}", path);
                     index_entries.push(IndexEntry::new(

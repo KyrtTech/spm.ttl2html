@@ -1,5 +1,5 @@
 [package]
-name = "turtle2rdf"
+name = "turtle2html"
 version = "0.1.0"
 edition = "2021"
 
@@ -11,4 +11,5 @@ serde = { version = "1.0", features = ["derive"] }
 walkdir = "2.3.2"
 url = "2.5.2"
 clap = { version = "4.0", features = ["derive"] }
+serde_json = "1.0.149"
 

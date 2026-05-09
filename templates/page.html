@@ -61,14 +61,13 @@
   <body>
     <div class="container">
       <h1>{{ title }}</h1>
-      {% for subject_group in subject_groups %} {% if subject_group.subject_link
-      %}
-      <div id="{{subject_group.subject_label}}"></div>
-      {% endif %}
-      <h2>
+      {% for subject_group in subject_groups %}
+      <h2 id="{{ subject_group.subject_anchor }}">
         {% if subject_group.subject_link %}
-        <a href="#{{subject_group.subject_label}}">{{ subject_group.subject_label }}</a>
-        {% else %} {{ subject_group.subject_label }} {% endif %}
+        <a href="#{{ subject_group.subject_anchor }}">{{ subject_group.subject_label }}</a>
+        {% else %}
+        {{ subject_group.subject_label }}
+        {% endif %}
       </h2>
       <table>
         <tr>

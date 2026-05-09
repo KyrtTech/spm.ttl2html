@@ -42,6 +42,8 @@ impl Default for Triple {
 pub struct SubjectGroup {
     subject: String,
     subject_label: String,
+    /// HTML fragment from entity name (IRI fragment / path tail / blank id), not a hash.
+    subject_anchor: String,
     subject_link: Option<String>,
     triples: Vec<Triple>,
 }
@@ -99,8 +101,7 @@ fn update_triple_with_links(triple: &mut Triple, prefixes: &Vec<&String>) {
 
 pub fn convert_file(
     input_path: &Path,
-    input_dir: &str,
-    output_dir: &str,
+    output_path: &Path,
     tera: &Tera,
 ) -> Result<PathBuf, Box<dyn std::error::Error>> {
     let input = fs::read_to_string(input_path)?;
@@ -122,7 +123,7 @@ pub fn convert_file(
             let object = match t.object {
                 Term::NamedNode(NamedNode { iri }) => iri.to_string(),
                 Term::Literal(Literal::Simple {value}) => value.to_string().trim_matches('"').to_string(),
-                Term::Literal(Literal::Typed {value, datatype}) => {
+                Term::Literal(Literal::Typed {value, datatype:_}) => {
                     format!("{}", value)
                 },
                 Term::Literal(Literal::LanguageTaggedString { value, language }) => {
@@ -173,10 +174,12 @@ pub fn convert_file(
             //  sort by predicate
             triples.sort_by(|a, b| a.predicate.cmp(&b.predicate));
 
+            let subject_label = triples[0].subject_label.clone();
             SubjectGroup {
+                subject_anchor: anchor_for_subject(&subject, &subject_label),
                 subject,
                 subject_link: triples[0].subject_link.clone(),
-                subject_label: triples[0].subject_label.clone(),
+                subject_label: subject_label.to_owned(),
                 triples,
             }
         })
@@ -191,18 +194,13 @@ pub fn convert_file(
 
     let html = tera.render("page", &context)?;
 
-    let relative_path = input_path.strip_prefix(input_dir)?;
-    let output_path = Path::new(output_dir)
-        .join(relative_path)
-        .with_extension("html");
-
     if let Some(parent) = output_path.parent() {
         fs::create_dir_all(parent)?;
     }
 
     fs::write(output_path, html)?;
 
-    Ok(relative_path.with_extension("html").to_path_buf())
+    Ok(output_path.to_path_buf())
 }
 
 pub fn generate_index(
@@ -224,4 +222,79 @@ pub fn generate_index(
 
 fn is_valid_url(s: &str) -> bool {
     Url::parse(s).is_ok()
+}
+
+/// Fragment of the IRI if present, otherwise the last non-empty path segment.
+fn local_name_from_iri(iri: &str) -> String {
+    let Ok(u) = Url::parse(iri) else {
+        return String::new();
+    };
+    if let Some(f) = u.fragment() {
+        return f.to_string();
+    }
+    u.path()
+        .rsplit('/')
+        .find(|s| !s.is_empty())
+        .unwrap_or("")
+        .to_string()
+}
+
+/// Safe HTML `id` / `#fragment`: alphanumerics, `_`, `-`, `.`, `:`; other chars → `-`.
+fn sanitize_fragment_id(raw: &str) -> String {
+    let mut out = String::with_capacity(raw.len());
+    let mut prev_dash = false;
+    for ch in raw.chars() {
+        let mapped = match ch {
+            'a'..='z' | 'A'..='Z' | '0'..='9' | '_' | '.' | ':' => Some(ch),
+            '-' => Some('-'),
+            ' ' | '/' | '\\' | '#' | '?' | '&' | '%' | '+' => Some('-'),
+            _ if !ch.is_control() && ch.is_alphanumeric() => Some(ch),
+            _ if !ch.is_control() => Some('-'),
+            _ => None,
+        };
+        if let Some(c) = mapped {
+            if c == '-' {
+                if !out.is_empty() && !prev_dash {
+                    out.push('-');
+                    prev_dash = true;
+                }
+            } else {
+                out.push(c);
+                prev_dash = false;
+            }
+        }
+    }
+    while out.ends_with('-') {
+        out.pop();
+    }
+    out
+}
+
+/// Anchor from the RDF node name only (no hashes). Falls back to `subject_label`, then `"node"`.
+fn anchor_for_subject(full_subject: &str, subject_label: &str) -> String {
+    let raw = if full_subject.starts_with("_:") {
+        full_subject
+            .strip_prefix("_:")
+            .unwrap_or(full_subject)
+            .to_string()
+    } else if is_valid_url(full_subject) {
+        let n = local_name_from_iri(full_subject);
+        if n.is_empty() {
+            subject_label.to_string()
+        } else {
+            n
+        }
+    } else {
+        subject_label.to_string()
+    };
+
+    let mut s = sanitize_fragment_id(&raw);
+    if s.is_empty() {
+        s = sanitize_fragment_id(subject_label);
+    }
+    if s.is_empty() {
+        "node".into()
+    } else {
+        s
+    }
 }
