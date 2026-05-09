@@ -12,6 +12,12 @@ use tera::{Context, Tera};
 use serde::Serialize;
 use url::Url;
 
+//  well known prefixes that will be used to link to the corresponding HTML pages
+const PREFIXES: [&str; 2] = [
+    "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "http://www.w3.org/2000/01/rdf-schema#",
+];
+
 #[derive(Serialize, Debug)]
 pub struct Triple {
     subject: String,
@@ -60,12 +66,12 @@ impl IndexEntry {
     }
 }
 
-fn update_triple_with_links(triple: &mut Triple, prefixes: &Vec<&String>) {
+fn update_triple_with_links(triple: &mut Triple, prefixes: &[String]) {
     if is_valid_url(&triple.subject) {
         for prefix in prefixes {
-            if triple.subject.starts_with(*prefix) {
+            if triple.subject.starts_with(prefix) {
                 triple.subject_link = Some(triple.subject.clone());
-                triple.subject_label = triple.subject.replace(*prefix, "");
+                triple.subject_label = triple.subject.replace(prefix, "");
 
                 break;
             }
@@ -74,9 +80,9 @@ fn update_triple_with_links(triple: &mut Triple, prefixes: &Vec<&String>) {
 
     if is_valid_url(&triple.predicate) {
         for prefix in prefixes {
-            if triple.predicate.starts_with(*prefix) {
+            if triple.predicate.starts_with(prefix) {
                 triple.predicate_link = Some(triple.predicate.clone());
-                triple.predicate = triple.predicate.replace(*prefix, "");
+                triple.predicate = triple.predicate.replace(prefix, "");
 
                 break;
             }
@@ -85,9 +91,9 @@ fn update_triple_with_links(triple: &mut Triple, prefixes: &Vec<&String>) {
 
     if is_valid_url(&triple.object) {
         for prefix in prefixes {
-            if triple.object.starts_with(*prefix) {
+            if triple.object.starts_with(prefix) {
                 triple.object_link = Some(triple.object.clone());
-                triple.object = triple.object.replace(*prefix, "");
+                triple.object = triple.object.replace(prefix, "");
 
                 break;
             }
@@ -147,7 +153,8 @@ pub fn convert_file(
             Ok::<(), TurtleError>(())
         });
 
-        let prefixes = parser.prefixes().values().collect::<Vec<&String>>();
+        let mut prefixes: Vec<String> = parser.prefixes().values().cloned().collect();
+        prefixes.extend(PREFIXES.iter().map(|p| p.to_string()));
 
         for mut triple in unparsed_triples {
             update_triple_with_links(&mut triple, &prefixes);
