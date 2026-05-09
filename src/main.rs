@@ -1,9 +1,11 @@
+mod manifest;
 mod parser;
 
+use crate::manifest::Manifest;
 use crate::parser::{convert_file, generate_index, IndexEntry};
 
 use clap::{Arg, Command};
-use std::{collections::HashMap, fs, path::Path};
+use std::{fs, path::Path};
 use tera::Tera;
 use walkdir::WalkDir;
 
@@ -40,13 +42,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let input_dir = matches.get_one::<String>("input").unwrap();
     let output_dir = matches.get_one::<String>("output").unwrap();
-    let manifest: HashMap<String, HashMap<String, String>> =
-        if let Some(path) = matches.get_one::<String>("manifest") {
-            let raw = fs::read_to_string(path)?;
-            serde_json::from_str(&raw)?
-        } else {
-            HashMap::new()
-        };
+    let manifest: Manifest = if let Some(path) = matches.get_one::<String>("manifest") {
+        let raw = fs::read_to_string(path)?;
+        serde_json::from_str(&raw)?
+    } else {
+        Manifest::default()
+    };
+
+    let publish_config = manifest.publish;
 
     fs::create_dir_all(output_dir)?;
 
@@ -66,13 +69,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let output_path = Path::new(output_dir)
                 .join(
                     manifest
-                        .get("routes")
-                        .unwrap_or(&HashMap::new())
+                        .routes
                         .get(&relative_path)
-                        .unwrap_or_else(|| &relative_path)
+                        .unwrap_or(&relative_path)
                 )
                 .with_extension("html");
-            match convert_file(path, &output_path, &tera) {
+            match convert_file(path, &output_path, &tera, &publish_config) {
                 Ok(rel_path) => {
                     println!("Successfully converted {:?}", path);
                     index_entries.push(IndexEntry::new(

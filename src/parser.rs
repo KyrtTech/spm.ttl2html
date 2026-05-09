@@ -12,6 +12,8 @@ use tera::{Context, Tera};
 use serde::Serialize;
 use url::Url;
 
+use crate::manifest::PublishConfig;
+
 //  well known prefixes that will be used to link to the corresponding HTML pages
 const PREFIXES: [&str; 2] = [
     "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -66,7 +68,16 @@ impl IndexEntry {
     }
 }
 
-fn update_triple_with_links(triple: &mut Triple, prefixes: &[String]) {
+fn rewrite_iri(iri: &str, publish_config: &Option<PublishConfig>) -> String {
+    if let Some(publish_config) = publish_config {
+        if iri.starts_with(&publish_config.ontology_prefix) {
+            return iri.replace(&publish_config.ontology_prefix, &publish_config.url);
+        }
+    }
+    iri.to_string()
+}
+
+fn update_triple_with_links(triple: &mut Triple, prefixes: &[String], publish_config: &Option<PublishConfig>) {
     if is_valid_url(&triple.subject) {
         for prefix in prefixes {
             if triple.subject.starts_with(prefix) {
@@ -84,6 +95,10 @@ fn update_triple_with_links(triple: &mut Triple, prefixes: &[String]) {
                 triple.predicate_link = Some(triple.predicate.clone());
                 triple.predicate = triple.predicate.replace(prefix, "");
 
+                if let Some(subject_link) = triple.predicate_link.as_ref() {
+                    triple.predicate_link = Some(rewrite_iri(subject_link, publish_config));
+                }
+
                 break;
             }
         }
@@ -96,6 +111,10 @@ fn update_triple_with_links(triple: &mut Triple, prefixes: &[String]) {
             if triple.object.starts_with(prefix) {
                 triple.object_link = Some(triple.object.clone());
                 triple.object = triple.object.replace(prefix, "");
+
+                if let Some(object_link) = triple.object_link.as_ref() {
+                    triple.object_link = Some(rewrite_iri(object_link, publish_config));
+                }
 
                 was_prefix_found = true;
                 break;
@@ -114,6 +133,7 @@ pub fn convert_file(
     input_path: &Path,
     output_path: &Path,
     tera: &Tera,
+    publish_config: &Option<PublishConfig>,
 ) -> Result<PathBuf, Box<dyn std::error::Error>> {
     let input = fs::read_to_string(input_path)?;
     let mut triples = Vec::new();
@@ -164,8 +184,7 @@ pub fn convert_file(
         prefixes.extend(PREFIXES.iter().map(|p| p.to_string()));
 
         for mut triple in unparsed_triples {
-            update_triple_with_links(&mut triple, &prefixes);
-
+            update_triple_with_links(&mut triple, &prefixes, publish_config);
             triples.push(triple);
         }
 

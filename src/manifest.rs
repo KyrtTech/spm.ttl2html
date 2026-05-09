@@ -1,0 +1,28 @@
+//! `manifest.json` shape: `routes`, optional `doc_base_url` + `ontology_prefix` for href rewriting.
+
+use serde::Deserialize;
+use std::collections::HashMap;
+
+#[derive(Debug, Deserialize)]
+pub struct PublishConfig {
+    pub url: String,
+    pub ontology_prefix: String,
+}
+impl Default for PublishConfig {
+    fn default() -> Self {
+        PublishConfig {
+            url: "".to_string(),
+            ontology_prefix: "".to_string(),
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Default)]
+#[serde(default)]
+pub struct Manifest {
+    pub routes: HashMap<String, String>,
+    pub publish: Option<PublishConfig>,
+}
+
+impl Manifest {
+}
