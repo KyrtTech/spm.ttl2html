@@ -3,7 +3,7 @@ use std::fs;
 
 use std::path::{Path, PathBuf};
 
-use rio_api::model::{NamedNode, Subject, Term, Literal};
+use rio_api::model::{Literal, NamedNode, Subject, Term};
 use rio_api::parser::TriplesParser;
 use rio_turtle::{TurtleError, TurtleParser};
 
@@ -90,18 +90,23 @@ fn update_triple_with_links(triple: &mut Triple, prefixes: &[String]) {
     }
 
     if is_valid_url(&triple.object) {
+        let mut was_prefix_found = false;
+
         for prefix in prefixes {
             if triple.object.starts_with(prefix) {
                 triple.object_link = Some(triple.object.clone());
                 triple.object = triple.object.replace(prefix, "");
 
+                was_prefix_found = true;
                 break;
             }
         }
 
-        // we may still have a valid url, but not a prefix
-        // this could be an external link
-        triple.object_link = Some(triple.object.clone());
+        if !was_prefix_found {
+            // we may still have a valid url, but not a prefix
+            // this could be an external link
+            triple.object_link = Some(triple.object.clone());
+        }
     }
 }
 
@@ -128,10 +133,12 @@ pub fn convert_file(
             let predicate = t.predicate.iri.to_string();
             let object = match t.object {
                 Term::NamedNode(NamedNode { iri }) => iri.to_string(),
-                Term::Literal(Literal::Simple {value}) => value.to_string().trim_matches('"').to_string(),
-                Term::Literal(Literal::Typed {value, datatype:_}) => {
+                Term::Literal(Literal::Simple { value }) => {
+                    value.to_string().trim_matches('"').to_string()
+                }
+                Term::Literal(Literal::Typed { value, datatype: _ }) => {
                     format!("{}", value)
-                },
+                }
                 Term::Literal(Literal::LanguageTaggedString { value, language }) => {
                     format!("{} (@{})", value, language)
                 }
