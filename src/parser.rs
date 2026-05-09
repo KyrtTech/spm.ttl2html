@@ -29,7 +29,9 @@ pub struct Triple {
     subject_link: Option<String>,
     subject_label: String,
     predicate_link: Option<String>,
+    should_predicate_link_open_in_new_tab: bool,
     object_link: Option<String>,
+    should_object_link_open_in_new_tab: bool,
 }
 
 impl Default for Triple {
@@ -42,6 +44,8 @@ impl Default for Triple {
             subject_link: None,
             subject_label: String::new(),
             object_link: None,
+            should_predicate_link_open_in_new_tab: false,
+            should_object_link_open_in_new_tab: false,
         }
     }
 }
@@ -75,6 +79,30 @@ fn rewrite_iri(iri: &str, publish_config: &Option<PublishConfig>) -> String {
         }
     }
     iri.to_string()
+}
+
+/// Absolute `http:` / `https:` links are external unless they start with `publish.url` (trimmed, no trailing slash).
+fn href_is_external(href: &str, publish_config: &Option<PublishConfig>) -> bool {
+    if !href.starts_with("http://") && !href.starts_with("https://") {
+        return false;
+    }
+    let Some(p) = publish_config else {
+        return true;
+    };
+    let base = p.url.trim().trim_end_matches('/');
+    if base.is_empty() {
+        return true;
+    }
+    !href.starts_with(base)
+}
+
+fn apply_new_tab_flags(triple: &mut Triple, publish_config: &Option<PublishConfig>) {
+    if let Some(predicate_link) = triple.predicate_link.as_ref() {
+        triple.should_predicate_link_open_in_new_tab = href_is_external(predicate_link, publish_config);
+    }
+    if let Some(object_link) = triple.object_link.as_ref() {
+        triple.should_object_link_open_in_new_tab = href_is_external(object_link, publish_config);
+    }
 }
 
 fn update_triple_with_links(triple: &mut Triple, prefixes: &[String], publish_config: &Option<PublishConfig>) {
@@ -173,6 +201,8 @@ pub fn convert_file(
                 subject_link: None,
                 predicate_link: None,
                 object_link: None,
+                should_predicate_link_open_in_new_tab: false,
+                should_object_link_open_in_new_tab: false,
             };
 
             unparsed_triples.push(triple);
@@ -185,6 +215,7 @@ pub fn convert_file(
 
         for mut triple in unparsed_triples {
             update_triple_with_links(&mut triple, &prefixes, publish_config);
+            apply_new_tab_flags(&mut triple, publish_config);
             triples.push(triple);
         }
 
