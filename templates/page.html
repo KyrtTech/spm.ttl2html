@@ -47,8 +47,31 @@
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
-      .predicate {
-        display: flex;
+      table.triples {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+      }
+      table.triples th,
+      table.triples td {
+        vertical-align: top;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #ddd;
+        text-align: left;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+      table.triples th {
+        background: #f0f0f0;
+        font-weight: 600;
+        color: #333;
+      }
+      table.triples col.predicate-col {
+        width: 26%;
+      }
+      table.triples col.object-col {
+        width: 74%;
       }
       footer {
         text-align: center;
@@ -69,25 +92,33 @@
         {{ subject_group.subject_label }}
         {% endif %}
       </h2>
-      <table>
-        <tr>
-          <th>Predicate</th>
-          <th>Object</th>
-        </tr>
+      <table class="triples">
+        <colgroup>
+          <col class="predicate-col" />
+          <col class="object-col" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th scope="col">Predicate</th>
+            <th scope="col">Object</th>
+          </tr>
+        </thead>
+        <tbody>
         {% for triple in subject_group.triples %}
         <tr>
           <td class="predicate">
             {% if triple.predicate_link %}
-            <a href="{{ triple.predicate_link }}">{{ triple.predicate }}</a>
+            <a href="{{ triple.predicate_link }}"{% if triple.should_predicate_link_open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ triple.predicate }}</a>
             {% else %} {{ triple.predicate }} {% endif %}
           </td>
           <td>
             {% if triple.object_link %}
-            <a href="{{ triple.object_link }}">{{ triple.object }}</a>
+            <a href="{{ triple.object_link }}"{% if triple.should_object_link_open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ triple.object }}</a>
             {% else %} {{ triple.object }} {% endif %}
           </td>
         </tr>
         {% endfor %}
+        </tbody>
       </table>
       {% endfor %}
     </div>
