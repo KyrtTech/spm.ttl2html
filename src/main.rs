@@ -11,7 +11,7 @@ use walkdir::WalkDir;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let matches = Command::new("RDF to HTML Converter")
-        .version("0.1.0")
+        .version("0.1.1")
         .author("Radu Dita <radu@kyrt.tech>")
         .about("Converts RDF Turtle files to HTML")
         .arg(

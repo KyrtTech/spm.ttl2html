@@ -75,6 +75,18 @@ impl IndexEntry {
 fn rewrite_iri(iri: &str, publish_config: &Option<PublishConfig>) -> String {
     if let Some(publish_config) = publish_config {
         if iri.starts_with(&publish_config.ontology_prefix) {
+            let new_iri = iri.replace(&publish_config.ontology_prefix, &publish_config.url);
+            let new_iri_url = Url::parse(&new_iri);
+            if let Ok(mut new_iri_url) = new_iri_url {
+                if publish_config.should_use_extesion_for_links {
+                    let mut path = new_iri_url.path().to_string();
+                    path.push_str(".html");
+                    new_iri_url.set_path(&path);
+                    return new_iri_url.to_string();
+                } else {
+                    return new_iri_url.to_string();
+                }
+            }
             return iri.replace(&publish_config.ontology_prefix, &publish_config.url);
         }
     }

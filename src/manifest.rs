@@ -7,12 +7,14 @@ use std::collections::HashMap;
 pub struct PublishConfig {
     pub url: String,
     pub ontology_prefix: String,
+    pub should_use_extesion_for_links: bool,
 }
 impl Default for PublishConfig {
     fn default() -> Self {
         PublishConfig {
             url: "".to_string(),
             ontology_prefix: "".to_string(),
+            should_use_extesion_for_links: false,
         }
     }
 }

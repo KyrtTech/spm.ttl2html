@@ -62,6 +62,8 @@ When present, ontology IRIs in link `href`s can be rewritten for deployment:
 
 - **`url`**: Base URL prefix used in generated links (e.g. your static docs site). Trailing slash is optional; it is normalized when matching “internal” links for [new-tab behavior](#generated-html-behavior).
 - **`ontology_prefix`**: Prefix of IRIs in the Turtle that should be replaced by `url` (e.g. `http://the-spm.org/`). Any predicate or object link whose IRI starts with this prefix is rewritten before being written to HTML.
+-  **`should_use_extesion_for_links`**(optional): Boolean value that decides if links for for generated `html` files should use the `html` extension or not. If set to `true` then `.html` will be added to the `ttl` for all the definitions.
+If set to `false` no changes are gonna be made to the prefix
 
 If `publish` is omitted, links keep the full IRIs from the Turtle (still useful for local preview).
 
@@ -77,7 +79,8 @@ See **`manifest.example.json`** in this directory for a copy-paste template. Min
   },
   "publish": {
     "url": "https://docs.example.com/ontology/",
-    "ontology_prefix": "http://the-spm.org/"
+    "ontology_prefix": "http://the-spm.org/",
+    "should_use_extesion_for_links": false,
   }
 }
 ```

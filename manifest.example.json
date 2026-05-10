@@ -6,6 +6,7 @@
   },
   "publish": {
     "url": "https://docs.example.com/ontology/",
-    "ontology_prefix": "http://the-spm.org/"
+    "ontology_prefix": "http://the-spm.org/",
+    "should_use_extesion_for_links": false
   }
 }
