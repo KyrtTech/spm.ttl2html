@@ -103,7 +103,7 @@ cargo run -- \
 
 ## Generated HTML behavior
 
-- **Per-file pages**: Each subject’s triples are grouped in a fixed-width **predicate / object** table; long IRIs wrap instead of stretching the layout.
+- **Per-file pages**: A sticky **On this page** roster on the left lists every definition and links to its in-page anchor; the main column groups each subject’s triples in a fixed-width **predicate / object** table with wrapping IRIs.
 - **Links**: Prefixes from each Turtle file (plus built-in RDF/RDFS vocabulary prefixes) shorten labels where possible; `http`/`https` links that are **not** under `publish.url` open in a **new tab** and show a small **external-link** icon.
 - **Back to top**: After scrolling down (~320px), a **floating button** appears to scroll smoothly to the top (`prefers-reduced-motion` uses instant scroll).
 - **Index**: `index.html` in the output directory lists all generated pages.
