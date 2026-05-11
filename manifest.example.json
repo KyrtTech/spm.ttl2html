@@ -7,6 +7,14 @@
   "publish": {
     "url": "https://docs.example.com/ontology/",
     "ontology_prefix": "http://the-spm.org/",
-    "should_use_extesion_for_links": false
+    "should_use_extesion_for_links": true,
+    "iri_routes": {
+      "entities/apps": "entities/app",
+      "entities/cloud_providers": "entities/cloud-providers",
+      "entities/cloud_services": "entities/cloud-services",
+      "entities/infra_providers": "entities/infra-providers",
+      "entities/package_managers": "entities/package-managers",
+      "entities/install_strategies": "entities/install-strategies"
+    }
   }
 }

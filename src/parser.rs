@@ -77,7 +77,14 @@ fn rewrite_iri(iri: &str, publish_config: &Option<PublishConfig>) -> String {
         if iri.starts_with(&publish_config.ontology_prefix) {
             let new_iri = iri.replace(&publish_config.ontology_prefix, &publish_config.url);
             let new_iri_url = Url::parse(&new_iri);
+
             if let Ok(mut new_iri_url) = new_iri_url {
+                let path = &new_iri_url.path()[1..];
+
+                if let Some(rewrite) = publish_config.iri_routes.get(path) {
+                    new_iri_url.set_path(rewrite);
+                }
+
                 if publish_config.should_use_extesion_for_links {
                     let mut path = new_iri_url.path().to_string();
                     path.push_str(".html");
@@ -110,14 +117,19 @@ fn href_is_external(href: &str, publish_config: &Option<PublishConfig>) -> bool 
 
 fn apply_new_tab_flags(triple: &mut Triple, publish_config: &Option<PublishConfig>) {
     if let Some(predicate_link) = triple.predicate_link.as_ref() {
-        triple.should_predicate_link_open_in_new_tab = href_is_external(predicate_link, publish_config);
+        triple.should_predicate_link_open_in_new_tab =
+            href_is_external(predicate_link, publish_config);
     }
     if let Some(object_link) = triple.object_link.as_ref() {
         triple.should_object_link_open_in_new_tab = href_is_external(object_link, publish_config);
     }
 }
 
-fn update_triple_with_links(triple: &mut Triple, prefixes: &[String], publish_config: &Option<PublishConfig>) {
+fn update_triple_with_links(
+    triple: &mut Triple,
+    prefixes: &[String],
+    publish_config: &Option<PublishConfig>,
+) {
     if is_valid_url(&triple.subject) {
         for prefix in prefixes {
             if triple.subject.starts_with(prefix) {

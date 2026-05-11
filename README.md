@@ -61,9 +61,11 @@ Maps each input file’s **relative path without `.ttl`** to the **relative outp
 When present, ontology IRIs in link `href`s can be rewritten for deployment:
 
 - **`url`**: Base URL prefix used in generated links (e.g. your static docs site). Trailing slash is optional; it is normalized when matching “internal” links for [new-tab behavior](#generated-html-behavior).
-- **`ontology_prefix`**: Prefix of IRIs in the Turtle that should be replaced by `url` (e.g. `http://the-spm.org/`). Any predicate or object link whose IRI starts with this prefix is rewritten before being written to HTML.
--  **`should_use_extesion_for_links`**(optional): Boolean value that decides if links for for generated `html` files should use the `html` extension or not. If set to `true` then `.html` will be added to the `ttl` for all the definitions.
-If set to `false` no changes are gonna be made to the prefix
+- **`ontology_prefix`**: Prefix of IRIs in the Turtle that should be replaced by `url` (e.g. `http://the-spm.org/`). Predicate and object links whose IRI starts with this prefix are rewritten before being written to HTML.
+- **`iri_routes`**: Map from an ontology **document path** (the path segment in the IRI after `ontology_prefix`, before `#`) to the **published document path** (relative to `url`, without `.html`). Use this when Turtle namespace paths differ from the HTML paths produced by `routes` (for example `entities/apps` in RDF vs `entities/app` on disk). If a path is not listed, the document path is left unchanged after the prefix swap. An empty object `{}` is valid.
+- **`should_use_extesion_for_links`**: When `true`, `.html` is appended to the document path in rewritten links after `iri_routes` is applied. When `false`, only the prefix swap and `iri_routes` remapping run.
+
+Link rewriting order: replace `ontology_prefix` with `url`, remap the document path with `iri_routes`, then append `.html` when `should_use_extesion_for_links` is `true`. URI fragments (`#localName`) are preserved.
 
 If `publish` is omitted, links keep the full IRIs from the Turtle (still useful for local preview).
 
@@ -75,12 +77,17 @@ See **`manifest.example.json`** in this directory for a copy-paste template. Min
 {
   "routes": {
     "schema": "vocab/schema",
-    "entities/application": "entities/app"
+    "entities/application": "entities/app",
+    "entities/cloud_provider": "entities/cloud-providers"
   },
   "publish": {
     "url": "https://docs.example.com/ontology/",
     "ontology_prefix": "http://the-spm.org/",
-    "should_use_extesion_for_links": false,
+    "should_use_extesion_for_links": true,
+    "iri_routes": {
+      "entities/apps": "entities/app",
+      "entities/cloud_providers": "entities/cloud-providers"
+    }
   }
 }
 ```
