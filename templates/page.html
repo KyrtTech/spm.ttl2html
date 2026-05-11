@@ -5,40 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ title }}</title>
     <style>
+      :root {
+        --page-bg: #f4f4f4;
+        --panel-bg: #fff;
+        --roster-bg: #f8f9fa;
+        --roster-border: #e0e0e0;
+        --text: #1a1a1a;
+        --muted: #5c5c5c;
+        --link: #0069c2;
+        --link-hover: #004a8f;
+        --accent: #007bff;
+        --shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: Arial, sans-serif;
+        font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont,
+          Arial, sans-serif;
         line-height: 1.6;
         margin: 0;
-        padding: 20px;
-        background-color: #f4f4f4;
+        color: var(--text);
+        background-color: var(--page-bg);
       }
-      h1 {
-        font-size: 24px;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #333;
-        padding-bottom: 10px;
-      }
-      ul {
-        list-style-type: none;
-        padding-left: 0;
-      }
-      li {
-        background: #fff;
-        margin: 10px 0;
-        padding: 10px;
-        border-radius: 5px;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-      }
-      li strong {
-        color: #555;
-      }
+
       a {
-        color: #007bff;
+        color: var(--link);
         text-decoration: none;
       }
+
       a:hover {
+        color: var(--link-hover);
         text-decoration: underline;
       }
+
       a .new-tab-icon {
         display: inline-block;
         width: 0.75em;
@@ -47,20 +49,121 @@
         vertical-align: -0.08em;
         opacity: 0.82;
       }
-      .container {
-        max-width: 800px;
-        margin: 0 auto;
-        background: #fff;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+      .page-shell {
+        display: flex;
+        align-items: flex-start;
+        gap: 0;
+        min-height: 100vh;
       }
+
+      .page-roster {
+        flex: 0 0 17rem;
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        max-height: 100vh;
+        overflow: auto;
+        padding: 1.25rem 1rem 1.5rem;
+        background: var(--roster-bg);
+        border-right: 1px solid var(--roster-border);
+      }
+
+      .roster-kicker {
+        margin: 0 0 0.35rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .roster-title {
+        margin: 0 0 1rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        line-height: 1.35;
+        color: var(--text);
+      }
+
+      .roster-nav {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .roster-nav li {
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      .roster-nav a {
+        display: block;
+        padding: 0.28rem 0.5rem;
+        border-left: 2px solid transparent;
+        border-radius: 0 4px 4px 0;
+        font-size: 0.875rem;
+        line-height: 1.35;
+        color: var(--muted);
+        word-break: break-word;
+      }
+
+      .roster-nav a:hover {
+        color: var(--link);
+        background: rgba(0, 105, 194, 0.06);
+        text-decoration: none;
+      }
+
+      .roster-nav a.is-active {
+        color: var(--link);
+        border-left-color: var(--accent);
+        background: rgba(0, 105, 194, 0.1);
+        font-weight: 600;
+      }
+
+      .page-main {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 1.5rem 1.75rem 2rem;
+      }
+
+      .page-content {
+        max-width: 52rem;
+        margin: 0 auto;
+        background: var(--panel-bg);
+        padding: 1.5rem 1.75rem;
+        border-radius: 6px;
+        box-shadow: var(--shadow);
+      }
+
+      h1 {
+        font-size: 1.6rem;
+        margin: 0 0 1.25rem;
+        border-bottom: 1px solid var(--roster-border);
+        padding-bottom: 0.75rem;
+      }
+
+      h2 {
+        scroll-margin-top: 1rem;
+        font-size: 1.15rem;
+        margin: 1.75rem 0 0.75rem;
+        padding-top: 0.25rem;
+      }
+
+      h2:first-of-type {
+        margin-top: 0;
+      }
+
       table.triples {
         width: 100%;
         table-layout: fixed;
         border-collapse: collapse;
-        margin: 1rem 0 1.5rem;
+        margin: 0 0 1.5rem;
       }
+
       table.triples th,
       table.triples td {
         vertical-align: top;
@@ -70,23 +173,29 @@
         word-break: break-word;
         overflow-wrap: anywhere;
       }
+
       table.triples th {
         background: #f0f0f0;
         font-weight: 600;
         color: #333;
       }
+
       table.triples col.predicate-col {
         width: 26%;
       }
+
       table.triples col.object-col {
         width: 74%;
       }
+
       footer {
         text-align: center;
-        margin-top: 20px;
-        font-size: 14px;
-        color: #777;
+        margin: 0;
+        padding: 1rem 1.25rem 1.5rem;
+        font-size: 0.875rem;
+        color: var(--muted);
       }
+
       .to-top-btn {
         position: fixed;
         bottom: 1.25rem;
@@ -100,7 +209,7 @@
         padding: 0;
         border: none;
         border-radius: 50%;
-        background: #007bff;
+        background: var(--accent);
         color: #fff;
         cursor: pointer;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -110,65 +219,116 @@
         transform: translateY(12px);
         transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
       }
+
       .to-top-btn.is-visible {
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
         transform: translateY(0);
       }
+
       .to-top-btn:hover {
         background: #0062cc;
       }
+
       .to-top-btn:focus {
         outline: 2px solid #0056b3;
         outline-offset: 2px;
       }
+
       .to-top-btn svg {
         width: 1.1rem;
         height: 1.1rem;
       }
+
+      @media (max-width: 900px) {
+        .page-shell {
+          flex-direction: column;
+        }
+
+        .page-roster {
+          position: static;
+          flex: none;
+          width: 100%;
+          max-height: none;
+          border-right: none;
+          border-bottom: 1px solid var(--roster-border);
+        }
+
+        .page-main {
+          padding: 1rem;
+        }
+
+        .page-content {
+          padding: 1rem 1.1rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .to-top-btn {
+          transition: none;
+        }
+      }
     </style>
   </head>
   <body>
-    <div class="container">
-      <h1 id="page-top" tabindex="-1">{{ title }}</h1>
-      {% for subject_group in subject_groups %}
-      <h2 id="{{ subject_group.subject_anchor }}">
-        {% if subject_group.subject_link %}
-        <a href="#{{ subject_group.subject_anchor }}">{{ subject_group.subject_label }}</a>
-        {% else %}
-        {{ subject_group.subject_label }}
-        {% endif %}
-      </h2>
-      <table class="triples">
-        <colgroup>
-          <col class="predicate-col" />
-          <col class="object-col" />
-        </colgroup>
-        <thead>
-          <tr>
-            <th scope="col">Predicate</th>
-            <th scope="col">Object</th>
-          </tr>
-        </thead>
-        <tbody>
-        {% for triple in subject_group.triples %}
-        <tr>
-          <td class="predicate">
-            {% if triple.predicate_link %}
-            <a href="{{ triple.predicate_link }}"{% if triple.should_predicate_link_open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ triple.predicate }}{% if triple.should_predicate_link_open_in_new_tab %}<svg class="new-tab-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>{% endif %}</a>
-            {% else %} {{ triple.predicate }} {% endif %}
-          </td>
-          <td>
-            {% if triple.object_link %}
-            <a href="{{ triple.object_link }}"{% if triple.should_object_link_open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ triple.object }}{% if triple.should_object_link_open_in_new_tab %}<svg class="new-tab-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>{% endif %}</a>
-            {% else %} {{ triple.object }} {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-      {% endfor %}
+    <div class="page-shell">
+      <aside class="page-roster" aria-label="Page index">
+        <p class="roster-kicker">On this page</p>
+        <p class="roster-title">{{ title }}</p>
+        <nav aria-label="Definitions">
+          <ul class="roster-nav" id="definition-roster">
+            {% for subject_group in subject_groups %}
+            <li>
+              <a href="#{{ subject_group.subject_anchor }}" data-roster-target="{{ subject_group.subject_anchor }}">{{ subject_group.subject_label }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="page-main">
+        <div class="page-content">
+          <h1 id="page-top" tabindex="-1">{{ title }}</h1>
+          {% for subject_group in subject_groups %}
+          <h2 id="{{ subject_group.subject_anchor }}">
+            {% if subject_group.subject_link %}
+            <a href="#{{ subject_group.subject_anchor }}">{{ subject_group.subject_label }}</a>
+            {% else %}
+            {{ subject_group.subject_label }}
+            {% endif %}
+          </h2>
+          <table class="triples">
+            <colgroup>
+              <col class="predicate-col" />
+              <col class="object-col" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col">Predicate</th>
+                <th scope="col">Object</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for triple in subject_group.triples %}
+            <tr>
+              <td class="predicate">
+                {% if triple.predicate_link %}
+                <a href="{{ triple.predicate_link }}"{% if triple.should_predicate_link_open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ triple.predicate }}{% if triple.should_predicate_link_open_in_new_tab %}<svg class="new-tab-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>{% endif %}</a>
+                {% else %} {{ triple.predicate }} {% endif %}
+              </td>
+              <td>
+                {% if triple.object_link %}
+                <a href="{{ triple.object_link }}"{% if triple.should_object_link_open_in_new_tab %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ triple.object }}{% if triple.should_object_link_open_in_new_tab %}<svg class="new-tab-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>{% endif %}</a>
+                {% else %} {{ triple.object }} {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% endfor %}
+        </div>
+      </main>
     </div>
     <footer>Generated by Turtle to HTML Converter</footer>
     <button
@@ -184,28 +344,57 @@
     <script>
       (function () {
         var btn = document.getElementById("to-top");
-        if (!btn) return;
-        var thresholdPx = 320;
-        function sync() {
-          if (window.scrollY > thresholdPx) {
-            btn.classList.add("is-visible");
-          } else {
-            btn.classList.remove("is-visible");
+        if (btn) {
+          var thresholdPx = 320;
+          function syncTop() {
+            if (window.scrollY > thresholdPx) {
+              btn.classList.add("is-visible");
+            } else {
+              btn.classList.remove("is-visible");
+            }
+          }
+          window.addEventListener("scroll", syncTop, { passive: true });
+          syncTop();
+          btn.addEventListener("click", function () {
+            var reduce =
+              window.matchMedia &&
+              window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            window.scrollTo({
+              top: 0,
+              behavior: reduce ? "auto" : "smooth",
+            });
+            var top = document.getElementById("page-top");
+            if (top) top.focus({ preventScroll: true });
+          });
+        }
+
+        var rosterLinks = document.querySelectorAll("[data-roster-target]");
+        var sections = Array.prototype.map.call(rosterLinks, function (link) {
+          var id = link.getAttribute("data-roster-target");
+          return document.getElementById(id);
+        }).filter(Boolean);
+
+        if (!rosterLinks.length || !sections.length) return;
+
+        function syncRoster() {
+          var active = sections[0];
+          for (var i = 0; i < sections.length; i++) {
+            var rect = sections[i].getBoundingClientRect();
+            if (rect.top <= 96) {
+              active = sections[i];
+            }
+          }
+          for (var j = 0; j < rosterLinks.length; j++) {
+            var link = rosterLinks[j];
+            var isActive =
+              active &&
+              link.getAttribute("data-roster-target") === active.id;
+            link.classList.toggle("is-active", Boolean(isActive));
           }
         }
-        window.addEventListener("scroll", sync, { passive: true });
-        sync();
-        btn.addEventListener("click", function () {
-          var reduce =
-            window.matchMedia &&
-            window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-          window.scrollTo({
-            top: 0,
-            behavior: reduce ? "auto" : "smooth",
-          });
-          var top = document.getElementById("page-top");
-          if (top) top.focus({ preventScroll: true });
-        });
+
+        window.addEventListener("scroll", syncRoster, { passive: true });
+        syncRoster();
       })();
     </script>
   </body>
