@@ -78,7 +78,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .unwrap_or(&relative_path)
                 )
                 .with_extension("html");
-            match convert_file(path, &output_path, &tera, &publish_config) {
+            let depth = output_path.to_string_lossy().replace(output_dir, "").match_indices("/").count() - 1;
+            let index_path = (0..depth).map(|_| "../").collect::<String>() + &index_name;
+
+            match convert_file(
+                path,
+                &output_path,
+                &index_path,
+                &tera,
+                &publish_config,
+            ) {
                 Ok(rel_path) => {
                     println!("Successfully converted {:?}", path);
                     index_entries.push(IndexEntry::new(

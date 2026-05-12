@@ -184,6 +184,7 @@ fn update_triple_with_links(
 pub fn convert_file(
     input_path: &Path,
     output_path: &Path,
+    index_path: &str,
     tera: &Tera,
     publish_config: &Option<PublishConfig>,
 ) -> Result<PathBuf, Box<dyn std::error::Error>> {
@@ -278,6 +279,10 @@ pub fn convert_file(
 
     let mut context = Context::new();
     context.insert("title", "Definitions");
+    context.insert(
+        "index_href",
+        index_path,
+    );
     context.insert("subject_groups", &subject_groups);
 
     let html = tera.render("page", &context)?;
