@@ -9,6 +9,7 @@ pub struct PublishConfig {
     pub ontology_prefix: String,
     pub should_use_extesion_for_links: bool,
     pub iri_routes: HashMap<String, String>,
+    pub index: Option<String>,
 }
 impl Default for PublishConfig {
     fn default() -> Self {
@@ -17,6 +18,7 @@ impl Default for PublishConfig {
             ontology_prefix: "".to_string(),
             should_use_extesion_for_links: false,
             iri_routes: HashMap::new(),
+            index: None,
         }
     }
 }

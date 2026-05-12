@@ -293,6 +293,7 @@ pub fn convert_file(
 
 pub fn generate_index(
     output_dir: &str,
+    name: &str,
     entries: &[IndexEntry],
     tera: &Tera,
 ) -> Result<(), Box<dyn std::error::Error>> {
@@ -302,7 +303,7 @@ pub fn generate_index(
 
     let html = tera.render("index", &context)?;
 
-    let index_path = Path::new(output_dir).join("index.html");
+    let index_path = Path::new(output_dir).join(name);
     fs::write(index_path, html)?;
 
     Ok(())

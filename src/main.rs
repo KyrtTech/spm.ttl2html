@@ -60,6 +60,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .expect("Failed to add index template");
 
     let mut index_entries = Vec::new();
+    let index_name = publish_config
+        .as_ref()
+        .and_then(|config| config.index.clone())
+        .unwrap_or_else(|| "index.html".to_string());
 
     for entry in WalkDir::new(input_dir).into_iter().filter_map(|e| e.ok()) {
         let path = entry.path();
@@ -87,7 +91,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    generate_index(output_dir, &index_entries, &tera)?;
+    generate_index(output_dir, &index_name, &index_entries, &tera)?;
 
     Ok(())
 }
