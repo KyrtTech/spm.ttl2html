@@ -56,6 +56,10 @@ Maps each input file’s **relative path without `.ttl`** to the **relative outp
 - Keys and values use forward-slash style segments (e.g. `entities/application` → `entities/app`).
 - Files not listed keep the same relative path as the input (only the extension changes to `.html`).
 
+### `html_snippet` (optional)
+
+Raw HTML appended to every generated page (each `.ttl` page and the index) immediately before the page footer on definition pages, or before `</body>` on the index. Omit the field or set it to `null` to skip injection. The snippet is inserted without escaping, so you can add markup, `<style>`, or `<script>` blocks.
+
 ### `publish` (optional)
 
 When present, ontology IRIs in link `href`s can be rewritten for deployment:
@@ -90,7 +94,8 @@ See **`manifest.example.json`** in this directory for a copy-paste template. Min
       "entities/apps": "entities/app",
       "entities/cloud_providers": "entities/cloud-providers"
     }
-  }
+  },
+  "html_snippet": "<p class=\"site-notice\">Published from the example manifest.</p>"
 }
 ```
 

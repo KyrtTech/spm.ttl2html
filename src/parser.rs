@@ -187,6 +187,7 @@ pub fn convert_file(
     index_path: &str,
     tera: &Tera,
     publish_config: &Option<PublishConfig>,
+    html_snippet: &Option<String>,
 ) -> Result<PathBuf, Box<dyn std::error::Error>> {
     let input = fs::read_to_string(input_path)?;
     let mut triples = Vec::new();
@@ -284,6 +285,7 @@ pub fn convert_file(
         index_path,
     );
     context.insert("subject_groups", &subject_groups);
+    context.insert("html_snippet", html_snippet);
 
     let html = tera.render("page", &context)?;
 
@@ -301,10 +303,12 @@ pub fn generate_index(
     name: &str,
     entries: &[IndexEntry],
     tera: &Tera,
+    html_snippet: &Option<String>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let mut context = Context::new();
     context.insert("title", "Index of RDF Files");
     context.insert("entries", entries);
+    context.insert("html_snippet", html_snippet);
 
     let html = tera.render("index", &context)?;
 

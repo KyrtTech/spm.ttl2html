@@ -87,6 +87,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 &index_path,
                 &tera,
                 &publish_config,
+                &manifest.html_snippet,
             ) {
                 Ok(rel_path) => {
                     println!("Successfully converted {:?}", path);
@@ -100,7 +101,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    generate_index(output_dir, &index_name, &index_entries, &tera)?;
+    generate_index(
+        output_dir,
+        &index_name,
+        &index_entries,
+        &tera,
+        &manifest.html_snippet,
+    )?;
 
     Ok(())
 }

@@ -28,6 +28,8 @@ impl Default for PublishConfig {
 pub struct Manifest {
     pub routes: HashMap<String, String>,
     pub publish: Option<PublishConfig>,
+    /// Optional raw HTML injected into every generated page before `</body>`.
+    pub html_snippet: Option<String>,
 }
 
 impl Manifest {

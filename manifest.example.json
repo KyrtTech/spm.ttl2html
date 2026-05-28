@@ -17,5 +17,6 @@
       "entities/package_managers": "entities/package-managers",
       "entities/install_strategies": "entities/install-strategies"
     }
-  }
+  },
+  "html_snippet": "<p class=\"site-notice\">Published from the example manifest.</p>"
 }
